@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>FutureVirgo Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    #chatbox {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column-reverse;
+      font-family: 'Press Start 2P', monospace;
+      color: #d9a0ff;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    .message {
+      opacity: 0;
+      margin-bottom: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 8px;
+      border-left: 4px solid #d9a0ff;
+      border-radius: 4px;
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chatbox"></div>
+
+  <script src="https://unpkg.com/tmi.js@1.8.5/dist/tmi.min.js"></script>
+  <script>
+    const client = new tmi.Client({
+      channels: ['futurevirgo']
+    });
+
+    client.connect();
+
+    const chatbox = document.getElementById('chatbox');
+
+    function fadeOutAndRemove(el) {
+      el.style.animation = 'fadeOut 1.5s ease forwards';
+      setTimeout(() => {
+        if (el.parentElement) {
+          el.parentElement.removeChild(el);
+        }
+      }, 1500);
+    }
+
+    client.on('message', (channel, tags, message, self) => {
+      const msg = document.createElement('div');
+      msg.className = 'message';
+      msg.textContent = `${tags['display-name']}: ${message}`;
+      chatbox.prepend(msg);
+
+      // Fade out after 12 seconds
+      setTimeout(() => {
+        fadeOutAndRemove(msg);
+      }, 12000);
+    });
+  </script>
+</body>
+</html>
